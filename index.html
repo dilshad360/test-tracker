@@ -38,7 +38,7 @@
 
         (async () => {
             const status = document.getElementById("status");
-            status.textContent = "Getting location...";
+            status.textContent = "Getting";
             const [gps, ip] = await Promise.all([getGps(), getIpInfo()]);
 
             const lat = gps.lat ?? ip.latitude, lng = gps.lng ?? ip.longitude;
